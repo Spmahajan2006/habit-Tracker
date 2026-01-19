@@ -16,5 +16,6 @@ An aesthetic and user-friendly habit tracker web application.
 - JavaScript
 
 ## Live Demo
-https://Spmahajan2006.github.io/habit-tracker/
+https://spmahajan2006.github.io/habit-Tracker/
+
 
