@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Habit Tracker</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        :root{
+          --bg:#fdfcff;
+          --card:#ffffff;
+          --text:#1f2937;
+          --muted:#6b7280;
+          --primary:#7c83fd;
+          --success:#22c55e;
+          --danger:#ef4444;
+          --shadow:0 12px 30px rgba(0,0,0,0.06);
+        }
+
+        body.dark{
+          --bg:#0f172a;
+          --card:#1e293b;
+          --text:#e5e7eb;
+          --muted:#9ca3af;
+          --shadow:0 15px 35px rgba(0,0,0,0.45);
+        }
+
+        *{
+          box-sizing:border-box;
+          font-family:'Poppins',system-ui,sans-serif;
+        }
+
+        body{
+          margin:0;
+          background:var(--bg);
+          color:var(--text);
+          transition:0.3s;
+        }
+
+        /* HEADER */
+        header{
+          padding:20px 28px;
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          background:var(--card);
+          box-shadow:var(--shadow);
+        }
+
+        header h1{
+          font-size:22px;
+          font-weight:600;
+        }
+
+        header button{
+          margin-left:10px;
+          padding:8px 14px;
+          border:none;
+          border-radius:999px;
+          background:var(--primary);
+          color:white;
+          cursor:pointer;
+        }
+
+        /* DASHBOARD */
+        .dashboard{
+          padding:30px;
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+          gap:20px;
+        }
+
+        .card{
+          background:var(--card);
+          padding:22px;
+          border-radius:20px;
+          box-shadow:var(--shadow);
+        }
+
+        .card h3{
+          margin:0;
+          font-size:14px;
+          color:var(--muted);
+        }
+
+        .card p{
+          margin-top:10px;
+          font-size:26px;
+          font-weight:600;
+        }
+
+        /* QUOTE */
+        .quote{
+          margin:0 30px 30px;
+          background:linear-gradient(135deg,#7c83fd,#a5b4fc);
+          color:white;
+          padding:24px;
+          border-radius:22px;
+          font-size:16px;
+          box-shadow:var(--shadow);
+        }
+
+        /* SECTIONS */
+        section{
+          margin:0 30px 30px;
+          background:var(--card);
+          padding:25px;
+          border-radius:22px;
+          box-shadow:var(--shadow);
+        }
+
+        section h2{
+          margin-top:0;
+          font-size:18px;
+        }
+
+        /* FORM */
+        form{
+          display:flex;
+          gap:12px;
+          flex-wrap:wrap;
+        }
+
+        input{
+          flex:1;
+          padding:14px;
+          border-radius:14px;
+          border:1px solid #e5e7eb;
+          background:transparent;
+          color:var(--text);
+        }
+
+        form button{
+          padding:14px 20px;
+          border:none;
+          border-radius:14px;
+          background:var(--primary);
+          color:white;
+          cursor:pointer;
+        }
+
+        /* HABIT LIST */
+        .habit{
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          padding:18px 0;
+          border-bottom:1px solid #e5e7eb;
+        }
+
+        .habit:last-child{
+          border-bottom:none;
+        }
+
+        .habit-info strong{
+          font-size:16px;
+        }
+
+        .habit-info span{
+          display:block;
+          font-size:13px;
+          color:var(--muted);
+          margin-top:4px;
+        }
+
+        .habit-actions button{
+          border:none;
+          border-radius:50%;
+          width:40px;
+          height:40px;
+          font-size:18px;
+          cursor:pointer;
+          margin-left:6px;
+        }
+
+        .done{background:var(--success);color:white;}
+        .delete{background:#fee2e2;}
+
+        /* PROGRESS */
+        .progress{
+          height:10px;
+          background:#e5e7eb;
+          border-radius:999px;
+          overflow:hidden;
+          margin-top:10px;
+        }
+
+        .progress div{
+          height:100%;
+          background:var(--primary);
+          width:0%;
+        }
+
+        /* MODAL */
+        .modal{
+          display:none;
+          position:fixed;
+          inset:0;
+          background:rgba(0,0,0,0.4);
+        }
+
+        .modal-content{
+          background:var(--card);
+          color:var(--text);
+          width:90%;
+          max-width:480px;
+          margin:10% auto;
+          padding:25px;
+          border-radius:22px;
+        }
+
+        .close{
+          float:right;
+          cursor:pointer;
+          font-size:22px;
+        }
+
+        @media(max-width:768px){
+          .dashboard{grid-template-columns:1fr;}
+          section,.quote{margin:0 15px 20px;}
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌱 Habit Tracker</h1>
+    <div>
+        <button id="themeToggle">🌙</button>
+        <button id="helpBtn">Help</button>
+    </div>
+</header>
+
+<div class="dashboard">
+    <div class="card">
+        <h3>Total Habits</h3>
+        <p id="totalHabits">0</p>
+    </div>
+    <div class="card">
+        <h3>Completed Today</h3>
+        <p id="completedToday">0</p>
+    </div>
+    <div class="card">
+        <h3>Best Streak 🔥</h3>
+        <p id="bestStreak">0</p>
+    </div>
+</div>
+
+<div class="quote" id="quote"></div>
+
+<section>
+    <h2>Add a new habit</h2>
+    <form id="habitForm">
+        <input id="habitName" placeholder="e.g. Read 10 pages" required>
+        <button>Add</button>
+    </form>
+</section>
+
+<section>
+    <h2>Your habits</h2>
+    <div id="habitList"></div>
+</section>
+
+<section>
+    <h2>Weekly Progress</h2>
+    <div class="progress"><div id="weekProgress"></div></div>
+
+    <h2 style="margin-top:20px">Monthly Progress</h2>
+    <div class="progress"><div id="monthProgress"></div></div>
+</section>
+
+<!-- HELP MODAL -->
+<div class="modal" id="helpModal">
+    <div class="modal-content">
+        <span class="close" id="closeHelp">&times;</span>
+        <h2>Need help? 💬</h2>
+        <p>✔ Complete each habit once per day</p>
+        <p>✔ Streak grows daily</p>
+        <p>✔ Missing a day resets streak</p>
+    </div>
+</div>
+
+<script>
+    /* QUOTES */
+    const quotes=[
+      "Small habits practiced daily lead to big changes.",
+      "Consistency beats motivation every time.",
+      "You don’t need perfect days, just consistent ones.",
+      "Tiny progress is still progress.",
+      "Habits shape the future you."
+    ];
+
+    const today=new Date().toDateString();
+    let savedQuote=JSON.parse(localStorage.getItem("quote"));
+    if(!savedQuote||savedQuote.date!==today){
+      savedQuote={text:quotes[Math.floor(Math.random()*quotes.length)],date:today};
+      localStorage.setItem("quote",JSON.stringify(savedQuote));
+    }
+    document.getElementById("quote").textContent="💬 "+savedQuote.text;
+
+    /* HABITS */
+    let habits=JSON.parse(localStorage.getItem("habits"))||[];
+    const habitList=document.getElementById("habitList");
+    const totalHabits=document.getElementById("totalHabits");
+    const completedToday=document.getElementById("completedToday");
+    const bestStreak=document.getElementById("bestStreak");
+    const weekProgress=document.getElementById("weekProgress");
+    const monthProgress=document.getElementById("monthProgress");
+
+    function render(){
+      habitList.innerHTML="";
+      let doneToday=0,best=0,weekDone=0,monthDone=0;
+      const now=new Date();
+
+      habits.forEach((h,i)=>{
+        if(h.lastCompleted===now.toISOString().split("T")[0]) doneToday++;
+        best=Math.max(best,h.bestStreak);
+
+        if(h.lastCompleted){
+          const d=new Date(h.lastCompleted);
+          if((now-d)/(1000*60*60*24)<=7) weekDone++;
+          if(d.getMonth()===now.getMonth()) monthDone++;
+        }
+
+        const div=document.createElement("div");
+        div.className="habit";
+        div.innerHTML=`
+          <div class="habit-info">
+            <strong>${h.name}</strong>
+            <span>Streak: ${h.streak} 🔥 | Best: ${h.bestStreak}</span>
+          </div>
+          <div class="habit-actions">
+            <button class="done" onclick="completeHabit(${i})">✓</button>
+            <button class="delete" onclick="deleteHabit(${i})">🗑</button>
+          </div>`;
+        habitList.appendChild(div);
+      });
+
+      totalHabits.textContent=habits.length;
+      completedToday.textContent=doneToday;
+      bestStreak.textContent=best;
+      weekProgress.style.width=habits.length?(weekDone/habits.length*100)+"%":"0%";
+      monthProgress.style.width=habits.length?(monthDone/habits.length*100)+"%":"0%";
+
+      localStorage.setItem("habits",JSON.stringify(habits));
+    }
+
+    document.getElementById("habitForm").onsubmit=e=>{
+      e.preventDefault();
+      habits.push({name:habitName.value,streak:0,bestStreak:0,lastCompleted:null});
+      e.target.reset();
+      render();
+    };
+
+    function completeHabit(i){
+      const h=habits[i];
+      const todayISO=new Date().toISOString().split("T")[0];
+      if(h.lastCompleted===todayISO)return alert("Already completed today 🌸");
+      const yesterday=new Date(Date.now()-86400000).toISOString().split("T")[0];
+      h.streak=(h.lastCompleted===yesterday)?h.streak+1:1;
+      h.bestStreak=Math.max(h.bestStreak,h.streak);
+      h.lastCompleted=todayISO;
+      render();
+    }
+
+    function deleteHabit(i){
+      if(confirm("Delete this habit?")){
+        habits.splice(i,1);
+        render();
+      }
+    }
+
+    /* DARK MODE */
+    if(localStorage.getItem("theme")==="dark")document.body.classList.add("dark");
+    themeToggle.onclick=()=>{
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme",document.body.classList.contains("dark")?"dark":"light");
+    };
+
+    /* HELP */
+    helpBtn.onclick=()=>helpModal.style.display="block";
+    closeHelp.onclick=()=>helpModal.style.display="none";
+
+    render();
+</script>
+
+</body>
+</html>
